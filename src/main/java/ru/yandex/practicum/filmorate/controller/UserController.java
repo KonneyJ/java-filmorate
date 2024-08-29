@@ -52,12 +52,13 @@ public class UserController {
     void validate(User user) {
         log.debug("Validation start for {}", user);
 
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            String message = "Email пользователя не может быть пустым и должен содержать символ @! email = " + user.getEmail();
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            String message = "Email пользователя не может быть пустым и должен содержать символ @! email = "
+                    + user.getEmail();
             log.error(message);
             throw new ValidationException(message);
         }
-        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             String message = "Логин не может быть пустым и содержать пробелы!";
             log.error(message);
             throw new ValidationException(message);
@@ -67,7 +68,7 @@ public class UserController {
             log.error(message);
             throw new ValidationException(message);
         }
-        if (user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }
