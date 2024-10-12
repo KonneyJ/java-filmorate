@@ -27,7 +27,7 @@ public class UserService {
         return userStorage.getUsers();
     }
 
-    public User createuser(User user) {
+    public User createUser(User user) {
         return userStorage.createUser(user);
     }
 

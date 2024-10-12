@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User user) {
         log.debug("POST /users with {}", user);
-        return userService.createuser(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
