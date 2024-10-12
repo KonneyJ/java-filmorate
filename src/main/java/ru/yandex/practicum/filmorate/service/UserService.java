@@ -95,7 +95,7 @@ public class UserService {
     public List<User> getCommonFriends(Integer id, Integer otherId) {
         HashSet<Integer> userFriends = (HashSet<Integer>) getUserById(id).getUserFriends();
         if (userFriends == null || userFriends.isEmpty()) {
-            log.error("У пользователя нет друзей");
+            log.error("У пользователя нет друзей.");
             throw new ValidationException("У пользователя нет друзей");
         }
         HashSet<Integer> otherUserFriends = (HashSet<Integer>) getUserById(otherId).getUserFriends();
