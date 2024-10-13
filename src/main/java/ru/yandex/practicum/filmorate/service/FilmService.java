@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.HashSet;
@@ -35,35 +36,31 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public String putLikeToFilm(Integer id, Integer userId) {
-        Film film = getFilmById(id);
+    public void putLikeToFilm(Film film, User user) {
         if (film.getFilmLikes() == null) {
             film.setFilmLikes(new HashSet<>());
         }
-        if (film.getFilmLikes().contains(userId)) {
+        if (film.getFilmLikes().contains(user.getId())) {
             log.error("Пользователь уже поставил лайк этому фильму");
             throw new ValidationException("Пользователь уже поставил лайк этому фильму");
         }
-        Set<Integer> filmLikes = film.getFilmLikes();
-        filmLikes.add(userId);
-        film.setFilmLikes(filmLikes);
-        return "Фильм успешно пролайкан";
+        film.getFilmLikes().add(user.getId());
+        log.debug("Фильму успешно добавлен лайк");
     }
 
-    public String deleteLikeFromFilm(Integer id, Integer userId) {
+    public void deleteLikeFromFilm(Integer id, Integer userId) {
         Film film = getFilmById(id);
-        if (film.getFilmLikes() == null || film.getFilmLikes().isEmpty()) {
+        if (film.getFilmLikes() == null) {
+            film.setFilmLikes(new HashSet<>());
             log.error("У фильма нет лайков");
             throw new NotFoundException("У фильма нет лайков");
         }
-        if (film.getFilmLikes().contains(userId)) {
-            film.getFilmLikes().remove(userId);
-            log.debug("Лайк успешно удален");
-            return "Лайк успешно удален";
-        } else {
+        if (!film.getFilmLikes().contains(userId)) {
             log.error("Данный пользователь не ставил лайк этому фильму");
             throw new NotFoundException("Данный пользователь не ставил лайк этому фильму");
         }
+        film.getFilmLikes().remove(userId);
+        log.debug("Лайк успешно удален");
     }
 
     public List<Film> getPopularFilms(Integer count) {

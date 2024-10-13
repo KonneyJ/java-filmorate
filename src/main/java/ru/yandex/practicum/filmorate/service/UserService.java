@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -35,7 +36,7 @@ public class UserService {
         return userStorage.updateUser(user);
     }
 
-    public String addUserToFriends(Integer id, Integer friendId) {
+    public void addUserToFriends(Integer id, Integer friendId) {
         User user = userStorage.getUserById(id);
         User friendUser = getUserById(friendId);
         if (user.getUserFriends() == null) {
@@ -55,29 +56,30 @@ public class UserService {
         user.setUserFriends(friendsUser);
         friendUser.setUserFriends(friendsUserFriend);
         log.debug("Пользователи добавлены друг к другу в друзья");
-        return "Пользователи добавлены друг к другу в друзья";
     }
 
-    public String deleteUserFromFriends(Integer id, Integer friendId) {
+    public void deleteUserFromFriends(Integer id, Integer friendId) {
         User user = getUserById(id);
+        log.debug("Пользователь с id {} существует", id);
         User friendUser = getUserById(friendId);
+        log.debug("Друг пользователя с id {} существует", friendId);
         if (user.getUserFriends() == null) {
-            log.error("У пользователя нет друзей");
+            log.error("У пользователя {} нет друзей", id);
             throw new NotFoundException("У пользователя нет друзей");
         }
         if (friendUser.getUserFriends() == null) {
-            log.error("У пользователя нет друзей");
-            throw new NotFoundException("У пользователя нет друзей");
+            log.error("У друга пользователя {} нет друзей", friendId);
+            throw new NotFoundException("У друга пользователя нет друзей");
         }
-        if (user.getUserFriends().contains(friendUser.getId()) || friendUser.getUserFriends().contains(user.getId())) {
-            user.getUserFriends().remove(friendId);
-            friendUser.getUserFriends().remove(id);
-            log.debug("Пользователи успешно удалены из списков друзей");
-            return "Пользователь успешно удален из списка друзей";
-        } else {
+        if (!user.getUserFriends().contains(friendId)) {
             log.error("Пользователи не являются друзьями");
             throw new NotFoundException("Пользователи не являются друзьями");
         }
+        user.getUserFriends().remove(friendId);
+        log.debug("Удалили из списка друзей пользователя с id {} друга с id {}", id, friendId);
+        friendUser.getUserFriends().remove(id);
+        log.debug("Удалили из списка друзей друга пользователя с id {} пользователя с id {}", friendId, id);
+        log.debug("Пользователи успешно удалены из списков друзей");
     }
 
     public List<User> getFriendsByUser(Integer id) {

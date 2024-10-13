@@ -40,15 +40,15 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public String addUserToFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
+    public void addUserToFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
         log.debug("PUT /users/{id}/friends by friendId {}", friendId);
-        return userService.addUserToFriends(id, friendId);
+        userService.addUserToFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public String deleteUserFromFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
+    public void deleteUserFromFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
         log.debug("DELETE /users/{id}/friends by friendId {}", friendId);
-        return userService.deleteUserFromFriends(id, friendId);
+        userService.deleteUserFromFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
