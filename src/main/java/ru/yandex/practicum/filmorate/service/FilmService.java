@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,15 +35,16 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public void putLikeToFilm(Film film, User user) {
+    public void putLikeToFilm(Integer filmId, Integer userId) {
+        Film film = getFilmById(filmId);
         if (film.getFilmLikes() == null) {
             film.setFilmLikes(new HashSet<>());
         }
-        if (film.getFilmLikes().contains(user.getId())) {
+        if (film.getFilmLikes().contains(userId)) {
             log.error("Пользователь уже поставил лайк этому фильму");
             throw new ValidationException("Пользователь уже поставил лайк этому фильму");
         }
-        film.getFilmLikes().add(user.getId());
+        film.getFilmLikes().add(userId);
         log.debug("Фильму успешно добавлен лайк");
     }
 
@@ -62,7 +63,7 @@ public class FilmService {
         log.debug("Лайк успешно удален");
     }
 
-    public List<Film> getPopularFilms(Integer count) {
+    public Collection<Film> getPopularFilms(Integer count) {
         return filmStorage.getFilms().stream()
                 .filter(film -> film.getFilmLikes() != null)
                 .filter(film -> !film.getFilmLikes().isEmpty())
