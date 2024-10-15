@@ -18,9 +18,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final UserService userService;
 
     public Film getFilmById(Integer id) {
-        return filmStorage.getFilmById(id);
+        Film film = filmStorage.getFilmById(id);
+        if (film == null) {
+            log.error("Фильм не найден!");
+            throw new NotFoundException("Фильм не найден!");
+        } else {
+            return film;
+        }
     }
 
     public List<Film> getFilms() {
@@ -32,10 +39,16 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        Film updatedFilm = filmStorage.updateFilm(film);
+        if (updatedFilm == null) {
+            throw new NotFoundException("Такого фильма нет, обновление невозможно!");
+        } else {
+            return updatedFilm;
+        }
     }
 
     public void putLikeToFilm(Integer filmId, Integer userId) {
+        userService.getUserById(userId);
         Film film = getFilmById(filmId);
         if (film.getFilmLikes() == null) {
             film.setFilmLikes(new HashSet<>());
@@ -49,6 +62,7 @@ public class FilmService {
     }
 
     public void deleteLikeFromFilm(Integer id, Integer userId) {
+        userService.getUserById(userId);
         Film film = getFilmById(id);
         if (film.getFilmLikes() == null) {
             film.setFilmLikes(new HashSet<>());
