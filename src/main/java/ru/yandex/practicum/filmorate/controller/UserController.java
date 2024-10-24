@@ -1,52 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
-    private int nextId = 1;
-    private final Map<Integer, User> userStorage = new HashMap<>();
+    private final UserService userService;
 
-    @GetMapping("/users")
-    public List<User> getUsers() {
-        log.debug("GET /users");
-        return new ArrayList<>(userStorage.values());
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable("id") Integer id) {
+        log.debug("GET /users by id {}", id);
+        return userService.getUserById(id);
     }
 
-    @PostMapping("/users")
+    @GetMapping
+    public List<User> getUsers() {
+        log.debug("GET /users");
+        return userService.getUsers();
+    }
+
+    @PostMapping
     public User createUser(@RequestBody User user) {
         log.debug("POST /users with {}", user);
         validate(user);
-        user.setId(getNextId());
-        userStorage.put(user.getId(), user);
-        return user;
+        return userService.createUser(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User updateUser(@RequestBody User user) {
         log.debug("PUT /users with {}", user);
-        if (!userStorage.containsKey(user.getId())) {
-            throw new ValidationException("Такого пользователя нет, обновление невозможно!");
-        }
         validate(user);
-        User userFromStorage = userStorage.get(user.getId());
-        userFromStorage.setId(user.getId());
-        userFromStorage.setEmail(user.getEmail());
-        userFromStorage.setLogin(user.getLogin());
-        userFromStorage.setName(user.getName());
-        userFromStorage.setBirthday(user.getBirthday());
-        userStorage.put(user.getId(), userFromStorage);
-        return userFromStorage;
+        return userService.updateUser(user);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addUserToFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.debug("PUT /users/{id}/friends by friendId {}", friendId);
+        userService.addUserToFriends(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteUserFromFriends(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId) {
+        log.debug("DELETE /users/{id}/friends by friendId {}", friendId);
+        userService.deleteUserFromFriends(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriendsByUser(@PathVariable Integer id) {
+        log.debug("GET /users/{id}/friends by id {}", id);
+        return userService.getFriendsByUser(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        log.debug("GET /users/{id}/friends/common by id {} and otherId {}", id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 
     void validate(User user) {
@@ -71,9 +89,5 @@ public class UserController {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-    }
-
-    private int getNextId() {
-        return nextId++;
     }
 }
