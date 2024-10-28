@@ -78,6 +78,8 @@ public class FilmDbStorage implements FilmStorage {
             if (film.getGenres() != null) {
                 film.getGenres().forEach(genre -> filmGenreStorage.addGenreToFilm(film.getId(), genre.getId()));
             }
+            //Collection<Like> filmLikes = likeStorage.getLikesByFilm(id);
+            //film.setFilmLikes((Set<Like>) filmLikes);
             return film;
         } catch (DataAccessException e) {
             throw new DataUpdateException("Не удалось сохранить данные");
@@ -99,12 +101,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        String query = "SELECT * FROM films WHERE id IN (SELECT film_id FROM film_likes GROUP BY film_id " +
-                "ORDER BY COUNT(film_id) DESC)";
+        String query = "SELECT f.*, m.name AS mpa_name FROM films AS f LEFT JOIN mpa AS m ON m.mpa_id=f.mpa_id WHERE f.id IN (SELECT film_id FROM film_likes GROUP BY film_id " +
+                "ORDER BY COUNT(film_id) DESC )";
         if (count > getFilms().size()) {
             return jdbc.query(query, filmMapper);
         }
-        return jdbc.query(query.concat(" LIMIT ?"), filmMapper, count);
+        return jdbc.query(query.concat("LIMIT ?"), filmMapper, count);
     }
 
 }

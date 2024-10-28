@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,12 +80,15 @@ public class FilmService {
     }
 
     public Collection<Film> getPopularFilms(Integer count) {
-        //return filmStorage.getPopularFilms(count);
-        return filmStorage.getFilms().stream()
+        if (count < 1) {
+            throw new ValidationException("Количество фильмов должно быть больше 0");
+        }
+        return filmStorage.getPopularFilms(count);
+        /*return filmStorage.getFilms().stream()
                 .filter(film -> film.getFilmLikes() != null)
-                .filter(film -> !film.getFilmLikes().isEmpty())
+                .filter(film -> film.getFilmLikes().size() > 0)
                 .sorted((film1, film2) -> film2.getFilmLikes().size() - film1.getFilmLikes().size())
                 .limit(count)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 }

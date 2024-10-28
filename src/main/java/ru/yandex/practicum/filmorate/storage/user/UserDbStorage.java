@@ -82,7 +82,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getFriendsByUser(Integer id) {
         try {
-            String query = "SELECT * FROM users WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
+            String query = "SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
             return jdbc.query(query, userMapper, id);
         } catch (DataAccessException e) {
             log.debug("У пользователя нет друзей");
@@ -94,7 +94,7 @@ public class UserDbStorage implements UserStorage {
     public List<User> getCommonFriends(Integer id, Integer otherId) {
         try {
             String query = "SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = ? )" +
-                    "AND IN (SELECT friend_id FROM friends WHERE user_id = ?)";
+                    " AND id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
             return jdbc.query(query, userMapper, id, otherId);
         } catch (DataAccessException e) {
             log.debug("У пользователей нет общих друзей");

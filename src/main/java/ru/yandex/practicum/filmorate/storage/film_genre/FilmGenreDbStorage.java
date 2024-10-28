@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film_genre;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.DataUpdateException;
@@ -23,6 +24,8 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         try {
             String query = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
             jdbc.update(query, filmId, genreId);
+        } catch (DuplicateKeyException e) {
+            log.warn("Ключ уже существует");
         } catch (DataAccessException e) {
             throw new DataUpdateException("Не удалось обновить данные");
         }
