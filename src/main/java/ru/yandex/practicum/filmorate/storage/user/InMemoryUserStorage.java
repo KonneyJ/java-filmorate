@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -9,13 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+
 @Slf4j
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserStorage {
     private int nextId = 1;
     private final Map<Integer, User> userStorage = new HashMap<>();
 
-    @Override
     public User getUserById(Integer id) {
         if (userStorage.containsKey(id)) {
             return userStorage.get(id);
@@ -24,13 +22,11 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    @Override
     public List<User> getUsers() {
         log.debug("GET /users");
         return new ArrayList<>(userStorage.values());
     }
 
-    @Override
     public User createUser(User user) {
         log.debug("POST /users with {}", user);
         user.setId(getNextId());
@@ -38,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    @Override
+
     public User updateUser(User user) {
         log.debug("PUT /users with {}", user);
         if (!userStorage.containsKey(user.getId())) {

@@ -4,20 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
     public User getUserById(Integer id) {
         User user = userStorage.getUserById(id);
@@ -38,6 +36,7 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+        userStorage.getUserById(user.getId());
         User updatedUser = userStorage.updateUser(user);
         if (updatedUser == null) {
             throw new NotFoundException("Такого пользователя нет, обновление невозможно!");
@@ -47,7 +46,10 @@ public class UserService {
     }
 
     public void addUserToFriends(Integer id, Integer friendId) {
-        User user = userStorage.getUserById(id);
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
+        friendStorage.addUserToFriends(id, friendId);
+        /*User user = userStorage.getUserById(id);
         User friendUser = getUserById(friendId);
         if (user.getUserFriends() == null) {
             user.setUserFriends(new HashSet<>());
@@ -64,12 +66,16 @@ public class UserService {
         friendsUser.add(friendId);
         friendsUserFriend.add(id);
         user.setUserFriends(friendsUser);
-        friendUser.setUserFriends(friendsUserFriend);
+        friendUser.setUserFriends(friendsUserFriend);*/
         log.debug("Пользователи добавлены друг к другу в друзья");
     }
 
     public void deleteUserFromFriends(Integer id, Integer friendId) {
-        User user = getUserById(id);
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
+        friendStorage.deleteUserFromFriends(id, friendId);
+        log.info("Пользователь успешно удален из списка друзей");
+        /*User user = getUserById(id);
         log.debug("Пользователь с id {} существует", id);
         User friendUser = getUserById(friendId);
         log.debug("Друг пользователя с id {} существует", friendId);
@@ -89,11 +95,13 @@ public class UserService {
             log.info("Пользователи успешно удалены из списков друзей");
         } else {
             log.error("Пользователи не являются друзьями");
-        }
+        }*/
     }
 
     public List<User> getFriendsByUser(Integer id) {
-        User user = getUserById(id);
+        userStorage.getUserById(id);
+        return userStorage.getFriendsByUser(id);
+        /*User user = getUserById(id);
         Set<Integer> userFriends = user.getUserFriends();
         if (userFriends == null) {
             userFriends = new HashSet<>();
@@ -101,11 +109,14 @@ public class UserService {
         }
         return user.getUserFriends().stream()
                 .map(friendId -> getUserById(friendId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        HashSet<Integer> userFriends = (HashSet<Integer>) getUserById(id).getUserFriends();
+        userStorage.getUserById(id);
+        userStorage.getUserById(otherId);
+        return userStorage.getCommonFriends(id, otherId);
+        /*HashSet<Integer> userFriends = (HashSet<Integer>) getUserById(id).getUserFriends();
         if (userFriends == null || userFriends.isEmpty()) {
             log.error("У пользователя нет друзей.");
             throw new ValidationException("У пользователя нет друзей");
@@ -119,6 +130,6 @@ public class UserService {
         commonFriends.retainAll(otherUserFriends);
         return commonFriends.stream()
                 .map(friendId -> getUserById(friendId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 }
