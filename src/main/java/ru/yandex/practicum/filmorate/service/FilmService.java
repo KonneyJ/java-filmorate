@@ -49,33 +49,11 @@ public class FilmService {
 
     public void putLikeToFilm(Integer filmId, Integer userId) {
         likeStorage.putLikeToFilm(filmId, userId);
-        /*userService.getUserById(userId);
-        Film film = getFilmById(filmId);
-        if (film.getFilmLikes() == null) {
-            film.setFilmLikes(new HashSet<>());
-        }
-        if (film.getFilmLikes().contains(userId)) {
-            log.error("Пользователь уже поставил лайк этому фильму");
-            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
-        }
-        film.getFilmLikes().add(userId);*/
         log.debug("Фильму успешно поставлен лайк");
     }
 
     public void deleteLikeFromFilm(Integer id, Integer userId) {
         likeStorage.deleteLikeFromFilm(id, userId);
-        /*userService.getUserById(userId);
-        Film film = getFilmById(id);
-        if (film.getFilmLikes() == null) {
-            film.setFilmLikes(new HashSet<>());
-            log.error("У фильма нет лайков");
-            throw new NotFoundException("У фильма нет лайков");
-        }
-        if (!film.getFilmLikes().contains(userId)) {
-            log.error("Данный пользователь не ставил лайк этому фильму");
-            throw new NotFoundException("Данный пользователь не ставил лайк этому фильму");
-        }
-        film.getFilmLikes().remove(userId);*/
         log.debug("Лайк успешно удален");
     }
 
@@ -84,11 +62,5 @@ public class FilmService {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
         return filmStorage.getPopularFilms(count);
-        /*return filmStorage.getFilms().stream()
-                .filter(film -> film.getFilmLikes() != null)
-                .filter(film -> film.getFilmLikes().size() > 0)
-                .sorted((film1, film2) -> film2.getFilmLikes().size() - film1.getFilmLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());*/
     }
 }

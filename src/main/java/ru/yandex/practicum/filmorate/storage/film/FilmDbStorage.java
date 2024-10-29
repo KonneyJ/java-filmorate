@@ -30,9 +30,6 @@ public class FilmDbStorage implements FilmStorage {
         String query = "SELECT f.*, m.name AS mpa_name FROM films AS f LEFT JOIN mpa AS m ON m.mpa_id=f.mpa_id WHERE id = ?";
         Film film = jdbc.queryForObject(query, filmMapper, id);
         List<Genre> genresByFilm = filmGenreStorage.getAllGenresByFilm(id);
-        /*if (film.getGenres() != null) {
-            film.getGenres().forEach(genre -> filmGenreStorage.addGenreToFilm(film.getId(), genre.getId()));
-        }*/
         film.setGenres(genresByFilm);
         return film;
     }
@@ -41,11 +38,6 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getFilms() {
         String query = "SELECT f.*, m.name AS mpa_name FROM films AS f LEFT JOIN mpa AS m ON m.mpa_id=f.mpa_id";
         List<Film> films = jdbc.query(query, filmMapper);
-
-        /*films.forEach(film -> {
-            Integer id = film.getId();
-            film.setFilmLikes((Set<Like>) likeStorage.getLikesByFilm(id));
-        });*/
         return films;
     }
 
@@ -78,8 +70,6 @@ public class FilmDbStorage implements FilmStorage {
             if (film.getGenres() != null) {
                 film.getGenres().forEach(genre -> filmGenreStorage.addGenreToFilm(film.getId(), genre.getId()));
             }
-            //Collection<Like> filmLikes = likeStorage.getLikesByFilm(id);
-            //film.setFilmLikes((Set<Like>) filmLikes);
             return film;
         } catch (DataAccessException e) {
             throw new DataUpdateException("Не удалось сохранить данные");
