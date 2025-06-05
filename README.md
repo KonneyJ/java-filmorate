@@ -18,6 +18,7 @@ Java, Spring Boot, REST API, H2 Database, JDBC, Maven, Lombok, Slf4j, JDBC Test
 - Структура проекта реализована по типам классов
 - Данные полученные из БД обрабатываются с помощью RowMapper
 - Реализованы интеграционные тесты для проверки работы приложения с зависимостями(базой данных)
+- Функциональность приложения была расширена в групповой работе ![](https://github.com/hohlovvitali/java-filmorate)
 
 ## ER-диаграмма
 ![shemabd.png](shemabd.png)
